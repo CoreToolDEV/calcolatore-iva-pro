@@ -233,7 +233,7 @@
 
         async function copyToClipboard(elementId) {
             const text = document.getElementById(elementId).innerText;
-            const cleanText = text.replace(/[^-0-9,]/g, '').replace(',', '.');
+            const cleanText = text.replace(/[^-0-9,]/g, '');
             try {
                 await navigator.clipboard.writeText(cleanText);
                 showCopyNotice();
