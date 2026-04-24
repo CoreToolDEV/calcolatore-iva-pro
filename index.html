@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calcolatore IVA 2026: Calcolo e Scorporo Rapido Online</title>
+    <meta name="description" content="Strumento professionale gratuito per il calcolo e lo scorporo dell'IVA. Semplice, veloce e ottimizzato per freelance e aziende.">
+    <meta name="keywords" content="calcolo iva, scorporo iva, calcolatore online, iva 22, iva 10, fatturazione professionale">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .copy-feedback { animation: fadeInOut 2s ease-in-out; }
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(10px); }
+            20% { opacity: 1; transform: translateY(0); }
+            80% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-10px); }
+        }
+        .value-updated { animation: pop 0.2s ease-out; }
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .btn-active { background-color: #0f172a !important; color: white !important; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); border-color: #0f172a !important; }
+        .mode-active { background-color: #eff6ff !important; border-color: #2563eb !important; color: #1d4ed8 !important; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+    <main class="flex-1 flex flex-col items-center justify-center px-4 py-12">
+        <div class="max-w-4xl w-full">
+            
+            <header class="mb-10 text-center md:text-left">
+                <h1 class="text-4xl font-extrabold text-slate-900 tracking-tight mb-2">Calcolatore IVA Professionale</h1>
+                <p class="text-slate-500 text-base">Lo strumento essenziale per freelance e imprese. Calcolo immediato e scorporo preciso.</p>
+            </header>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 bg-white p-8 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.04)] border border-slate-100">
+                
+                <div class="md:col-span-2 space-y-8">
+                    <div>
+                        <label class="block text-[11px] font-bold uppercase text-slate-400 mb-3 tracking-[0.15em]">Importo Base (€)</label>
+                        <input type="number" id="mainAmount" placeholder="0.00" 
+                            class="w-full text-5xl font-black p-5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:outline-none transition-all">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <button onclick="setMode('add')" id="btn-add" class="mode-btn py-4 px-6 rounded-2xl border-2 border-transparent bg-slate-100 text-slate-500 font-bold text-sm hover:bg-slate-200 transition-all">
+                            Aggiungi IVA
+                        </button>
+                        <button onclick="setMode('subtract')" id="btn-subtract" class="mode-btn py-4 px-6 rounded-2xl border-2 border-transparent bg-slate-100 text-slate-500 font-bold text-sm hover:bg-slate-200 transition-all">
+                            Scorpora IVA
+                        </button>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-bold uppercase text-slate-400 mb-3 tracking-[0.15em]">Seleziona Aliquota</label>
+                        <div class="flex flex-wrap gap-3">
+                            <button onclick="setVat(22, this)" class="vat-btn py-3 px-6 rounded-xl bg-slate-100 text-slate-600 text-sm font-bold hover:bg-slate-200 transition-all">22%</button>
+                            <button onclick="setVat(10, this)" class="vat-btn py-3 px-6 rounded-xl bg-slate-100 text-slate-600 text-sm font-bold hover:bg-slate-200 transition-all">10%</button>
+                            <button onclick="setVat(5, this)" class="vat-btn py-3 px-6 rounded-xl bg-slate-100 text-slate-600 text-sm font-bold hover:bg-slate-200 transition-all">5%</button>
+                            <button onclick="setVat(4, this)" class="vat-btn py-3 px-6 rounded-xl bg-slate-100 text-slate-600 text-sm font-bold hover:bg-slate-200 transition-all">4%</button>
+                            
+                            <div id="customVatWrapper" class="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 transition-all">
+                                <input type="number" id="customVat" placeholder="Altro" 
+                                    onfocus="applyCustomVat()" 
+                                    oninput="applyCustomVat()"
+                                    class="w-16 p-2 bg-transparent text-sm text-center font-black focus:outline-none">
+                                <span class="text-xs text-slate-400 font-bold">%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-6">
+                    <div class="bg-blue-600 p-8 rounded-3xl text-white flex-1 flex flex-col justify-between shadow-xl shadow-blue-100 relative overflow-hidden min-h-[250px]">
+                        
+                        <div class="space-y-6">
+                            <div onclick="copyToClipboard('resSecondary1Value')" class="group cursor-pointer flex justify-between items-center opacity-70 border-b border-blue-400/50 pb-3 hover:opacity-100 transition-opacity">
+                                <span id="resSecondary1Label" class="text-[10px] font-bold uppercase tracking-widest">Imponibile</span>
+                                <span id="resSecondary1Value" class="text-lg font-bold">0,00 €</span>
+                            </div>
+                            
+                            <div onclick="copyToClipboard('resVat')" class="group cursor-pointer flex justify-between items-center opacity-70 border-b border-blue-400/50 pb-3 hover:opacity-100 transition-opacity">
+                                <span id="vatLabel" class="text-[10px] font-bold uppercase tracking-widest">IVA (22%)</span>
+                                <span id="resVat" class="text-lg font-bold">0,00 €</span>
+                            </div>
+                        </div>
+
+                        <div id="mainResultContainer" onclick="copyToClipboard('resMain')" class="cursor-pointer group pt-6 flex flex-col origin-left">
+                            <span id="resMainLabel" class="text-[10px] font-bold uppercase tracking-[0.2em] opacity-60 mb-2">Totale Lordo</span>
+                            <div class="flex items-baseline gap-1">
+                                <span id="resMain" class="text-5xl font-black leading-none tracking-tighter">0,00 €</span>
+                            </div>
+                            <span class="text-[9px] mt-4 opacity-40 font-bold uppercase tracking-wider group-hover:opacity-100 transition-opacity">Clicca per copiare il valore</span>
+                        </div>
+
+                        <div id="copyNotice" class="hidden absolute inset-0 bg-slate-900/95 flex items-center justify-center text-sm font-bold copy-feedback text-center px-6">
+                            Copiato negli appunti!
+                        </div>
+                    </div>
+
+                    <div id="stampDutyCard" class="hidden bg-amber-50 p-4 rounded-2xl border border-amber-200 text-center animate-pulse">
+                        <p class="text-[11px] font-bold text-amber-800 uppercase tracking-tight">Bollo di 2,00€ richiesto (> 77,47€)</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8 border-t border-slate-200 pt-10">
+                <div>
+                    <h3 class="text-sm font-bold text-slate-900 uppercase tracking-widest mb-4">Note Legali & Disclaimer</h3>
+                    <p class="text-xs text-slate-500 leading-relaxed">
+                        Questo calcolatore IVA è uno strumento gratuito fornito a scopo informativo. Sebbene ci sforziamo di garantire la precisione, i risultati non sostituiscono il parere di un commercialista. Si consiglia di verificare sempre i calcoli prima di emettere fatture o documenti fiscali.
+                    </p>
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-slate-900 uppercase tracking-widest mb-4">Advertising & Business</h3>
+                    <p class="text-xs text-slate-500 leading-relaxed">
+                        Sei un'azienda del settore fintech o servizi fiscali? Questo strumento è visitato quotidianamente da professionisti e freelance. Per opportunità di advertising o collaborazioni, contattaci alla mail dedicata.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-white border-t border-slate-200 py-8 w-full mt-auto">
+        <div class="max-w-4xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="text-center md:text-left">
+                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em] mb-1">
+                    © 2026 Calcolatore IVA • CoreTool Professional
+                </p>
+                <p class="text-[9px] text-slate-300 font-medium">Semplificando la gestione fiscale ogni giorno.</p>
+            </div>
+            <div class="flex flex-col items-center md:items-end gap-2">
+                <span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Business Inquiries:</span>
+                <a href="mailto:coretool.inbox@protonmail.com" class="text-sm font-black text-blue-600 hover:text-blue-700 transition-colors border-b-2 border-blue-100 hover:border-blue-600">
+                    coretool.inbox@protonmail.com
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        let currentMode = 'add'; 
+        let currentVatRate = 22;
+
+        const mainAmountInput = document.getElementById('mainAmount');
+        const resMain = document.getElementById('resMain');
+        const resMainLabel = document.getElementById('resMainLabel');
+        const mainResultContainer = document.getElementById('mainResultContainer');
+        const resSecondary1Value = document.getElementById('resSecondary1Value');
+        const resSecondary1Label = document.getElementById('resSecondary1Label');
+        const resVat = document.getElementById('resVat');
+        const vatLabel = document.getElementById('vatLabel');
+        const stampDutyCard = document.getElementById('stampDutyCard');
+        const copyNotice = document.getElementById('copyNotice');
+        const customVatInput = document.getElementById('customVat');
+        const customVatWrapper = document.getElementById('customVatWrapper');
+
+        document.addEventListener('DOMContentLoaded', () => {
+            setMode('add');
+            const defaultBtn = Array.from(document.querySelectorAll('.vat-btn')).find(b => b.innerText === '22%');
+            if(defaultBtn) setVat(22, defaultBtn);
+        });
+
+        function setMode(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('mode-active'));
+            document.getElementById('btn-' + mode).classList.add('mode-active');
+            calculate();
+        }
+
+        function setVat(rate, element) {
+            currentVatRate = parseFloat(rate) || 0;
+            document.querySelectorAll('.vat-btn').forEach(btn => btn.classList.remove('btn-active'));
+            customVatWrapper.classList.remove('ring-2', 'ring-blue-500');
+            if (element) element.classList.add('btn-active');
+            calculate();
+        }
+
+        function applyCustomVat() {
+            document.querySelectorAll('.vat-btn').forEach(btn => btn.classList.remove('btn-active'));
+            customVatWrapper.classList.add('ring-2', 'ring-blue-500');
+            const val = parseFloat(customVatInput.value);
+            if (!isNaN(val)) {
+                currentVatRate = val;
+                calculate();
+            }
+        }
+
+        function calculate() {
+            const inputVal = parseFloat(mainAmountInput.value) || 0;
+            let net, vat, total;
+
+            if (currentMode === 'add') {
+                net = inputVal;
+                vat = (net * currentVatRate) / 100;
+                total = net + vat;
+                resMainLabel.innerText = "Totale Lordo";
+                resMain.innerText = formatCurrency(total);
+                resSecondary1Label.innerText = "Imponibile Netto";
+                resSecondary1Value.innerText = formatCurrency(net);
+            } else {
+                total = inputVal;
+                net = total / (1 + (currentVatRate / 100));
+                vat = total - net;
+                resMainLabel.innerText = "Imponibile Netto";
+                resMain.innerText = formatCurrency(net);
+                resSecondary1Label.innerText = "Totale Lordo";
+                resSecondary1Value.innerText = formatCurrency(total);
+            }
+
+            resVat.innerText = formatCurrency(vat);
+            vatLabel.innerText = `IVA (${currentVatRate}%)`;
+
+            mainResultContainer.classList.remove('value-updated');
+            void mainResultContainer.offsetWidth; 
+            mainResultContainer.classList.add('value-updated');
+
+            if (net > 77.47 && currentVatRate === 0) {
+                stampDutyCard.classList.remove('hidden');
+            } else {
+                stampDutyCard.classList.add('hidden');
+            }
+        }
+
+        function formatCurrency(value) {
+            return value.toLocaleString('it-IT', { style: 'currency', currency: 'EUR' });
+        }
+
+        async function copyToClipboard(elementId) {
+            const text = document.getElementById(elementId).innerText;
+            const cleanText = text.replace(/[^-0-9,]/g, '').replace(',', '.');
+            try {
+                await navigator.clipboard.writeText(cleanText);
+                showCopyNotice();
+            } catch (err) { console.error(err); }
+        }
+
+        function showCopyNotice() {
+            copyNotice.classList.remove('hidden');
+            setTimeout(() => copyNotice.classList.add('hidden'), 2000);
+        }
+
+        mainAmountInput.addEventListener('input', calculate);
+    </script>
+</body>
+</html>
