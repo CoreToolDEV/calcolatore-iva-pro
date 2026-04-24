@@ -237,7 +237,9 @@
             try {
                 await navigator.clipboard.writeText(cleanText);
                 showCopyNotice();
-            } catch (err) { console.error(err); }
+                } catch (err) { 
+                console.error("Errore durante la copia:", err); 
+            }
         }
 
         function showCopyNotice() {
