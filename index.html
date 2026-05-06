@@ -21,7 +21,7 @@
         .value-updated { animation: pop 0.2s ease-out; }
         @keyframes pop {
             0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+            50% { transform: scale(1.02); }
             100% { transform: scale(1); }
         }
         .btn-active { background-color: #0f172a !important; color: white !important; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); border-color: #0f172a !important; }
@@ -44,7 +44,7 @@
                     <div>
                         <label class="block text-[11px] font-bold uppercase text-slate-400 mb-3 tracking-[0.15em]">Importo Base (€)</label>
                         <input type="number" id="mainAmount" placeholder="0.00" 
-                            class="w-full text-5xl font-black p-5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:outline-none transition-all">
+                            class="w-full text-3xl md:text-5xl font-black p-5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:outline-none transition-all">
                     </div>
 
                     <div class="grid grid-cols-2 gap-4">
@@ -76,29 +76,31 @@
                 </div>
 
                 <div class="flex flex-col gap-6">
-                    <div class="bg-blue-600 p-8 rounded-3xl text-white flex-1 flex flex-col justify-between shadow-xl shadow-blue-100 relative overflow-hidden min-h-[250px]">
+                    <!-- Risultati: Rimosso overflow-hidden e aggiunto padding protettivo -->
+                    <div class="bg-blue-600 p-6 md:p-8 rounded-3xl text-white flex-1 flex flex-col justify-between shadow-xl shadow-blue-100 relative min-h-[300px] w-full overflow-visible">
                         
                         <div class="space-y-6">
-                            <div onclick="copyToClipboard('resSecondary1Value')" class="group cursor-pointer flex flex-wrap justify-between items-end opacity-70 border-b border-blue-400/50 pb-3 hover:opacity-100 transition-opacity gap-2">
-    <span id="resSecondary1Label" class="text-[10px] font-bold uppercase tracking-widest mb-1">Imponibile</span>
-    <span id="resSecondary1Value" class="text-lg font-bold break-all text-right leading-tight">0,00 €</span>
-</div>
+                            <div onclick="copyToClipboard('resSecondary1Value')" class="group cursor-pointer flex justify-between items-start gap-4 opacity-70 border-b border-blue-400/50 pb-3 hover:opacity-100 transition-opacity">
+                                <span id="resSecondary1Label" class="text-[10px] font-bold uppercase tracking-widest mt-1">Imponibile</span>
+                                <span id="resSecondary1Value" class="text-lg font-bold text-right break-all">0,00 €</span>
+                            </div>
                             
-                            <div onclick="copyToClipboard('resVat')" class="group cursor-pointer flex flex-wrap justify-between items-end opacity-70 border-b border-blue-400/50 pb-3 hover:opacity-100 transition-opacity gap-2">
-    <span id="vatLabel" class="text-[10px] font-bold uppercase tracking-widest mb-1">IVA (22%)</span>
-    <span id="resVat" class="text-lg font-bold break-all text-right leading-tight">0,00 €</span>
-</div>
+                            <div onclick="copyToClipboard('resVat')" class="group cursor-pointer flex justify-between items-start gap-4 opacity-70 border-b border-blue-400/50 pb-3 hover:opacity-100 transition-opacity">
+                                <span id="vatLabel" class="text-[10px] font-bold uppercase tracking-widest mt-1">IVA (22%)</span>
+                                <span id="resVat" class="text-lg font-bold text-right break-all">0,00 €</span>
+                            </div>
                         </div>
 
-                        <div id="mainResultContainer" onclick="copyToClipboard('resMain')" class="cursor-pointer group pt-6 flex flex-col origin-left">
-    <span id="resMainLabel" class="text-[10px] font-bold uppercase tracking-[0.2em] opacity-60 mb-2">Risultato</span>
-    <div class="w-full">
-        <span id="resMain" class="text-3xl sm:text-4xl md:text-5xl font-black leading-none tracking-tighter break-all block">0,00 €</span>
-    </div>
-    <span class="text-[9px] mt-4 opacity-40 font-bold uppercase tracking-wider group-hover:opacity-100 transition-opacity">Clicca per copiare il valore</span>
-</div>
+                        <div id="mainResultContainer" onclick="copyToClipboard('resMain')" class="cursor-pointer group pt-6 flex flex-col origin-left w-full">
+                            <span id="resMainLabel" class="text-[10px] font-bold uppercase tracking-[0.2em] opacity-60 mb-2">Totale Lordo</span>
+                            <div class="w-full">
+                                <!-- Testo con break-all e font scalabile per evitare l'uscita dai bordi -->
+                                <span id="resMain" class="text-3xl sm:text-4xl md:text-5xl font-black leading-tight tracking-tighter break-all block">0,00 €</span>
+                            </div>
+                            <span class="text-[9px] mt-4 opacity-40 font-bold uppercase tracking-wider group-hover:opacity-100 transition-opacity">Clicca per copiare</span>
+                        </div>
 
-                        <div id="copyNotice" class="hidden absolute inset-0 bg-slate-900/95 flex items-center justify-center text-sm font-bold copy-feedback text-center px-6">
+                        <div id="copyNotice" class="hidden absolute inset-0 bg-slate-900/95 rounded-3xl flex items-center justify-center text-sm font-bold copy-feedback text-center px-6 z-10">
                             Copiato negli appunti!
                         </div>
                     </div>
@@ -216,6 +218,15 @@
             resVat.innerText = formatCurrency(vat);
             vatLabel.innerText = `IVA (${currentVatRate}%)`;
 
+            // Rileva se il numero è molto lungo per ridurre ulteriormente il font
+            if (resMain.innerText.length > 12) {
+                resMain.classList.replace('text-3xl', 'text-2xl');
+                resMain.classList.replace('md:text-5xl', 'md:text-4xl');
+            } else {
+                resMain.classList.add('text-3xl');
+                resMain.classList.add('md:text-5xl');
+            }
+
             mainResultContainer.classList.remove('value-updated');
             void mainResultContainer.offsetWidth; 
             mainResultContainer.classList.add('value-updated');
@@ -225,17 +236,6 @@
             } else {
                 stampDutyCard.classList.add('hidden');
             }
-            // Ridimensionamento dinamico del font principale in base alla lunghezza
-const mainRes = document.getElementById('resMain');
-const lunghezzaTesto = mainRes.innerText.length;
-
-if (lunghezzaTesto > 18) {
-    mainRes.style.fontSize = "1.5rem"; // Molto piccolo per cifre enormi
-} else if (lunghezzaTesto > 12) {
-    mainRes.style.fontSize = "2.25rem"; // Dimensione media
-} else {
-    mainRes.style.fontSize = ""; // Torna alla dimensione originale del CSS
-}
         }
 
         function formatCurrency(value) {
